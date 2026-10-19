@@ -1,0 +1,86 @@
+exelearning-viewer {
+    display: block;
+}
+
+.exe-viewer-header {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.exe-viewer-frame {
+    border: 0;
+    display: block;
+    height: var(--exe-viewer-height, 600px);
+    width: 100%;
+}
+
+exelearning-viewer:fullscreen {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+}
+
+exelearning-viewer:fullscreen .exe-viewer-frame {
+    flex: 1;
+    height: auto;
+}
+
+.exe-metadata {
+    display: grid;
+    gap: 0.25rem 1rem;
+    grid-template-columns: max-content 1fr;
+}
+
+.exe-metadata dd {
+    margin: 0;
+}
+
+.exe-preview-frame {
+    border: 1px solid #e7e7ed;
+    height: 70vh;
+    width: 100%;
+}
+
+.exe-editor-dialog {
+    border: 0;
+    height: 100vh;
+    margin: 0;
+    max-height: none;
+    max-width: none;
+    padding: 0;
+    width: 100vw;
+}
+
+.exe-editor-dialog[open] {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.exe-editor-toolbar {
+    align-items: center;
+    flex: none;
+    border-bottom: 1px solid #e7e7ed;
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+}
+
+.exe-editor-status {
+    flex: 1;
+}
+
+.exe-editor-frame {
+    border: 0;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+.exe-resource-card .aspect-ratio img {
+    object-fit: cover;
+}

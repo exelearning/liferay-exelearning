@@ -1,0 +1,19 @@
+def editorDirectory = rootProject.file("build/exelearning-editor")
+
+processResources {
+	from(new File(editorDirectory, "static")) {
+		into "static"
+	}
+
+	from(editorDirectory) {
+		include "LICENSE", "THIRD-PARTY-NOTICES.md", "VERSION"
+		into "META-INF/exelearning-editor"
+	}
+
+	doFirst {
+		if (!new File(editorDirectory, "static/index.html").exists()) {
+			throw new GradleException(
+				"The static eXeLearning editor is missing. Run \"make build-editor\" first.")
+		}
+	}
+}

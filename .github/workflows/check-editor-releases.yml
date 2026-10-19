@@ -1,0 +1,147 @@
+---
+name: Check Editor Releases
+
+# Watches exelearning/exelearning for a newer release and opens one pull request
+# that bumps .editor-version. Before that it builds the editor from the new tag
+# and both OSGi bundles, so a broken upstream build never reaches a PR. Nothing
+# is tagged, published or deployed here: merging the reviewed PR is the only way
+# a new editor reaches a release.
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # Daily at 8:00 UTC
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      found: ${{ steps.check.outputs.found }}
+      current: ${{ steps.check.outputs.current }}
+      tag: ${{ steps.check.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Compare the latest editor release with .editor-version
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LATEST=$(gh api repos/exelearning/exelearning/releases/latest --jq '.tag_name' 2>/dev/null || echo "")
+          if [ -z "$LATEST" ]; then
+            echo "No release found"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # The tag comes from another repository and reaches make, git and the
+          # pull request: accept only a plain version tag (bash =~ anchors the
+          # whole string, so an embedded newline cannot slip through).
+          VERSION_TAG='^v[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?$'
+          if ! [[ "$LATEST" =~ $VERSION_TAG ]]; then
+            echo "::error::Refusing unexpected editor release tag format"
+            exit 1
+          fi
+          CURRENT=$(tr -d '[:space:]' < .editor-version)
+          echo "Latest editor release: $LATEST, pinned: $CURRENT"
+          echo "tag=$LATEST" >> "$GITHUB_OUTPUT"
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+
+          NEWEST=$(printf '%s\n%s\n' "$CURRENT" "$LATEST" | sort -V | tail -n 1)
+          if [ "$LATEST" = "$CURRENT" ] || [ "$NEWEST" != "$LATEST" ]; then
+            echo "Already up to date"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # Runs upstream build scripts (bun install), so it only gets a read-only token
+  # and keeps it off disk.
+  build:
+    needs: check
+    if: needs.check.outputs.found == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build the editor and both OSGi bundles from the new tag
+        env:
+          EXELEARNING_EDITOR_REF: ${{ needs.check.outputs.tag }}
+          EXELEARNING_EDITOR_REF_TYPE: tag
+        run: make build
+
+  pull_request:
+    needs: [check, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Pin the new editor release
+        env:
+          TAG: ${{ needs.check.outputs.tag }}
+        run: echo "$TAG" > .editor-version
+
+      - name: Open or update the pull request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          base: main
+          branch: feature/editor-${{ needs.check.outputs.tag }}
+          delete-branch: true
+          add-paths: .editor-version
+          commit-message: Update eXeLearning editor to ${{ needs.check.outputs.tag }}
+          title: Update eXeLearning editor to ${{ needs.check.outputs.tag }}
+          body: |
+            Pins the embedded editor to [${{ needs.check.outputs.tag }}](https://github.com/exelearning/exelearning/releases/tag/${{ needs.check.outputs.tag }}) (was `${{ needs.check.outputs.current }}`).
+
+            The scheduled check already built the editor from this tag and both OSGi bundles (`make build`).
+
+            Before merging:
+
+            - [ ] Review the upstream changes, especially `public/app/core/EmbeddingBridge.js` and `doc/development/embedding.md`: [compare](https://github.com/exelearning/exelearning/compare/${{ needs.check.outputs.current }}...${{ needs.check.outputs.tag }}). Update `frontend/src/protocol.ts` and the `REQUEST_SAVE` fallback in `frontend/src/editor-bridge.ts` if the contract changed.
+            - [ ] Run CI. Pull requests opened with the default `GITHUB_TOKEN` do not trigger workflows: close and reopen this PR, or push a commit.
+            - [ ] `tests/e2e/05-editing.spec.ts` passes against the new editor.
+
+            Nothing is published by this workflow.

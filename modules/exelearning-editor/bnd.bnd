@@ -1,0 +1,6 @@
+Bundle-Description: Static eXeLearning editor served by org.exelearning.liferay.web. Contains no code that runs on the server.
+Bundle-License: AGPL-3.0-or-later
+Bundle-Name: eXeLearning Editor
+Bundle-SymbolicName: org.exelearning.liferay.editor
+Bundle-Version: 0.1.0
+-sources: false

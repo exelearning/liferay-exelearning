@@ -1,0 +1,58 @@
+# Local development stack: Liferay Portal CE 7.4 GA132 + PostgreSQL 16.
+# Credentials come from .env (see .env.example).
+name: liferay-exelearning
+
+services:
+  db:
+    image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  liferay:
+    image: liferay/portal:7.4.3.132-ga132@sha256:5358cea6a39703d31d2d38b275314cde75d490b08ad1a6b5d757e295f0256dd7
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Development only: lets "make seed" create content pages through the
+      # headless site-pages API. The integration itself does not need it.
+      LIFERAY_FEATURE_PERIOD_FLAG_PERIOD__UPPERCASEL__UPPERCASEP__UPPERCASES__MINUS_178052: "true"
+      # Development only: demo users created by "make seed" can log in without
+      # an e-mail verification round trip (no mail server in this stack).
+      LIFERAY_COMPANY_PERIOD_SECURITY_PERIOD_STRANGERS_PERIOD_VERIFY: "false"
+      LIFERAY_DEFAULT_PERIOD_ADMIN_PERIOD_PASSWORD: ${LIFERAY_ADMIN_PASSWORD:?set LIFERAY_ADMIN_PASSWORD in .env}
+      LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_DRIVER_UPPERCASEC_LASS_UPPERCASEN_AME: org.postgresql.Driver
+      LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_PASSWORD: ${POSTGRES_PASSWORD}
+      LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_USERNAME: ${POSTGRES_USER}
+      LIFERAY_JPDA_ENABLED: ${LIFERAY_DEBUG:-false}
+      LIFERAY_JVM_OPTS: ${LIFERAY_JVM_OPTS:--Xms1g -Xmx2g}
+      LIFERAY_PASSWORDS_PERIOD_DEFAULT_PERIOD_POLICY_PERIOD_CHANGE_PERIOD_REQUIRED: "false"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://localhost:8080/c/portal/layout"]
+      interval: 10s
+      timeout: 30s
+      retries: 6
+      start_period: 600s
+    ports:
+      - "127.0.0.1:${LIFERAY_PORT:-8080}:8080"
+      - "127.0.0.1:8000:8000"
+    restart: unless-stopped
+    volumes:
+      - liferay-data:/opt/liferay/data
+      - liferay-modules:/opt/liferay/osgi/modules
+
+volumes:
+  db-data:
+  liferay-data:
+  liferay-modules:
