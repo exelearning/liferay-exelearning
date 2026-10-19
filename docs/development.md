@@ -20,7 +20,7 @@ GNU Make, Bun (editor builds from source) and, optionally, JDK 21. Without a loc
 | Service | Image | Notes |
 | --- | --- | --- |
 | `liferay` | `liferay/portal:7.4.3.132-ga132` (pinned digest) | `127.0.0.1:${LIFERAY_PORT:-8080}`, JPDA `127.0.0.1:8000` when `LIFERAY_DEBUG=true` |
-| `db` | `postgres:16.15-alpine` (pinned digest) | volume `db-data` |
+| `db` | `postgres:18.6-alpine` (pinned digest) | volume `db-data` |
 
 Volumes `liferay-data` (Documents and Media store, search index, publication cache) and
 `liferay-modules` (deployed bundles) survive `make down`/`make up`; only `make reset` deletes them.

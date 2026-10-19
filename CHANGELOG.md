@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The development stack uses PostgreSQL 18. Existing development databases are not migrated:
+  run `make reset` after updating.
+
 ## [0.1.0] - 2026-10-19
 
 First implementation of [exelearning/exelearning#2575](https://github.com/exelearning/exelearning/issues/2575).

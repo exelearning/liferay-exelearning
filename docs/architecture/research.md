@@ -54,7 +54,7 @@ Sources: the three repositories at their default branches on 2026-10-19 and the 
 | JUnit / Mockito / JaCoCo | 4.13.2 / 5.23.0 / 0.8.14 | Verified |
 | Node.js | 22+ (CI uses 24) | Verified locally with 26 |
 | Bun (editor build) | 1.4.x | Verified with 1.4.3 |
-| PostgreSQL | 16.15 | Works (verified); official matrix for 7.4 lists 12–15 (assumed) |
+| PostgreSQL | 18.6 (development stack) | Works (verified by the integration and E2E suites); Liferay's official matrix for 7.4 lists older versions (assumed) |
 | DXP 7.4 / quarterly | — | **Assumed** compatible, not tested |
 | Firefox | Playwright `e2e-firefox` | Verified locally (E2E 12/12), not part of CI |
 
