@@ -32,8 +32,9 @@ updates:
       dev-tooling:
         patterns: ["*"]
 
+  # A Liferay Workspace has no root build.gradle; the build files live in the modules.
   - package-ecosystem: gradle
-    directory: "/"
+    directories: ["/modules/*"]
     schedule:
       interval: weekly
       day: monday
