@@ -230,6 +230,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - run: npm ci
+      # The CSRF test drives a real browser session.
+      - run: npx playwright install --with-deps chromium
       - uses: actions/download-artifact@v8
         with:
           name: bundles
