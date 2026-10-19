@@ -1,0 +1,11 @@
+.cache/
+.env
+.gradle/
+build/
+dist/
+frontend/dist/
+modules/*/build/
+node_modules_cache/
+node_modules/
+playwright-report/
+test-results/

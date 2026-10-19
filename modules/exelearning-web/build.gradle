@@ -1,0 +1,61 @@
+apply plugin: "jacoco"
+
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "release.portal.api"
+	compileOnly group: "javax.ws.rs", name: "javax.ws.rs-api"
+	compileOnly group: "org.osgi", name: "org.osgi.service.jaxrs"
+	sourceFormatter group: "com.liferay", name: "com.liferay.source.formatter", version: "1.0.1633"
+	testImplementation group: "com.liferay.portal", name: "release.portal.api"
+	testImplementation group: "javax.ws.rs", name: "javax.ws.rs-api"
+	testImplementation group: "junit", name: "junit", version: "4.13.2"
+	testImplementation group: "org.json", name: "json", version: "20231013"
+	testImplementation group: "org.mockito", name: "mockito-core", version: "5.23.0"
+	testImplementation group: "org.osgi", name: "org.osgi.service.jaxrs"
+	testRuntimeOnly group: "org.apache.cxf", name: "cxf-rt-frontend-jaxrs", version: "3.6.12"
+}
+
+jacoco {
+	toolVersion = "0.8.14"
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				counter = "LINE"
+				minimum = 0.90
+			}
+		}
+	}
+}
+
+jacocoTestReport {
+	reports {
+		html.required = true
+		xml.required = true
+	}
+}
+
+processResources {
+	from(rootProject.file("frontend/dist")) {
+		include "exelearning.css", "exelearning.js"
+		into "META-INF/resources/js"
+	}
+}
+
+test {
+
+	// Liferay's kernel utilities need the same opens as the portal JVM
+
+	jvmArgs "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED", "--add-opens=java.base/java.lang=ALL-UNNAMED"
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs += ["-Xlint:all,-options,-processing,-serial"]
+	options.release = 11
+}
+
+check.dependsOn checkSourceFormatting, jacocoTestCoverageVerification
+jacocoTestCoverageVerification.dependsOn jacocoTestReport
+jacocoTestReport.dependsOn test
+test.finalizedBy jacocoTestReport

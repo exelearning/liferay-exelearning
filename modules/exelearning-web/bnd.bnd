@@ -1,0 +1,6 @@
+Bundle-License: AGPL-3.0-or-later
+Bundle-Name: eXeLearning Web
+Bundle-SymbolicName: org.exelearning.liferay.web
+Bundle-Version: 0.1.0
+Web-ContextPath: /exelearning-web
+-sources: false
