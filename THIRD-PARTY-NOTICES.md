@@ -4,7 +4,7 @@
 
 - **Bundle:** `org.exelearning.liferay.editor` (`static/`), built from
   [exelearning/exelearning](https://github.com/exelearning/exelearning) at the tag in
-  `.editor-version` (v4.0.5, commit `63748a3d87c8c3a757ef5f3479945db871ddb4c2` for 0.1.0) with
+  `.editor-version` (v4.0.5, commit `63748a3d87c8c3a757ef5f3479945db871ddb4c2` for 4.0.5) with
   `bun run build:static`. The exact ref and commit are recorded in the bundle at
   `META-INF/exelearning-editor/VERSION` and in each release's `VERSION` file.
 - **License:** GNU Affero General Public License v3.0 or later. The upstream `LICENSE` and

@@ -10,9 +10,9 @@ Sources: `scripts/package.sh`, the `package` target in the `Makefile`,
 version from the request; ask only if it cannot be determined. An audit does not authorize
 tags, releases or merges; honor authorization already given in the session.
 
-1. Version metadata: `Bundle-Version` in `modules/exelearning-web/bnd.bnd` and
-   `modules/exelearning-editor/bnd.bnd` equals the version without pre-release suffix, and
-   `package.json` `version` equals it exactly. `package.sh` refuses the build otherwise.
+1. Version metadata: the repository keeps `Bundle-Version: 0.0.0` in both `bnd.bnd` files and
+   `0.0.0-alpha` in `package.json`; do not bump them. `package.sh` stamps the version without
+   pre-release suffix into the bundles; check it in the built JAR names and manifests.
 2. Editor: `.editor-version` is an upstream release tag (not a branch), and the editor is
    built from it (`make build-editor`; first line of `build/exelearning-editor/VERSION` is
    `tag:<tag>`). Do not change `.editor-version` just to test a workflow.

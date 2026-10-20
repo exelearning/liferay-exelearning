@@ -107,8 +107,9 @@ task paths (`:modules:exelearning-web:test`); root tasks would run the workspace
 
 - `make build-editor` builds the editor from `.editor-version` (cached per ref). Experiments:
   `EXELEARNING_EDITOR_REF=<branch|sha> EXELEARNING_EDITOR_REF_TYPE=branch|commit`.
-- Releases come from `vX.Y.Z` tags via `.github/workflows/release.yml`; `Bundle-Version` in both
-  `bnd.bnd` files and `package.json` must equal the version (the packaging script checks it).
+- Releases come from `vX.Y.Z` tags via `.github/workflows/release.yml`. The repository keeps the
+  placeholder versions `Bundle-Version: 0.0.0` and `package.json` `0.0.0-alpha`; the packaging
+  script stamps the release version into both `bnd.bnd` files for the build only.
 - `make package` builds, verifies manifests and contents, excludes development files and writes
   SHA-256 checksums.
 

@@ -18,13 +18,16 @@ fail() {
 
 [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || fail "VERSION must be semantic (x.y.z), got '$VERSION'"
 
-# The bundle versions are the source of truth; a release must match them.
-for bnd in "$ROOT"/modules/*/bnd.bnd; do
-	bundle_version="$(sed -n 's/^Bundle-Version: *//p' "$bnd")"
-	[ "$bundle_version" = "${VERSION%%-*}" ] || fail "$bnd has Bundle-Version $bundle_version, expected ${VERSION%%-*}"
+# The repository keeps the placeholder Bundle-Version 0.0.0; the release stamps
+# the version without pre-release suffix (OSGi versions have no "-") for this
+# build only and restores the bnd files afterwards.
+backup="$(mktemp -d)"
+trap 'cp "$backup/exelearning-web.bnd" "$ROOT/modules/exelearning-web/bnd.bnd"; cp "$backup/exelearning-editor.bnd" "$ROOT/modules/exelearning-editor/bnd.bnd"; rm -rf "$backup"' EXIT
+for module in exelearning-web exelearning-editor; do
+	bnd="$ROOT/modules/$module/bnd.bnd"
+	cp "$bnd" "$backup/$module.bnd"
+	sed "s/^Bundle-Version: .*/Bundle-Version: ${VERSION%%-*}/" "$backup/$module.bnd" > "$bnd"
 done
-package_version="$(node -p "require('$ROOT/package.json').version")"
-[ "$package_version" = "$VERSION" ] || fail "package.json version is $package_version, expected $VERSION"
 
 cd "$ROOT"
 scripts/build-editor.sh

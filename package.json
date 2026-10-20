@@ -1,6 +1,6 @@
 {
     "name": "liferay-exelearning",
-    "version": "0.1.0",
+    "version": "0.0.0-alpha",
     "private": true,
     "description": "eXeLearning integration for Liferay Portal and Liferay DXP: frontend and test tooling",
     "license": "AGPL-3.0-or-later",

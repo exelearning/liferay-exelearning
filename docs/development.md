@@ -80,10 +80,11 @@ same ref is never rebuilt. `EXELEARNING_EDITOR_REF_TYPE=release` downloads the o
 ## Packaging
 
 ```bash
-make package VERSION=0.1.0
+make package VERSION=4.0.5
 ```
 
-Checks that `VERSION` matches both `Bundle-Version`s and `package.json`, rebuilds everything,
+Stamps `VERSION` (without pre-release suffix) into both `Bundle-Version`s for this build, which
+are `0.0.0` in the repository and restored afterwards, rebuilds everything,
 verifies manifests and contents, rejects development files and writes
 `dist/liferay-exelearning-<version>.zip` plus `.sha256`.
 

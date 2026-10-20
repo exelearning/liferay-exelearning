@@ -2,18 +2,15 @@
 
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
-[Semantic Versioning](https://semver.org/).
+[Semantic Versioning](https://semver.org/); releases follow the version of the bundled
+eXeLearning editor, as the other eXeLearning plugins do.
 
 ## [Unreleased]
 
-### Changed
+## [4.0.5] - 2026-10-20
 
-- The development stack uses PostgreSQL 18. Existing development databases are not migrated:
-  run `make reset` after updating.
-
-## [0.1.0] - 2026-10-19
-
-First implementation of [exelearning/exelearning#2575](https://github.com/exelearning/exelearning/issues/2575).
+First release, bundling eXeLearning editor v4.0.5. Implements
+[exelearning/exelearning#2575](https://github.com/exelearning/exelearning/issues/2575).
 
 ### Added
 
@@ -29,5 +26,5 @@ First implementation of [exelearning/exelearning#2575](https://github.com/exelea
 - Embedded eXeLearning editor v4.0.5 (`/o/exelearning-editor`) with the official postMessage
   protocol, optimistic concurrency and server-confirmed saves.
 - REST API `/o/exelearning/v1`, system settings, English and Spanish translations.
-- Docker Compose development stack, Makefile, demo seed, CI with 90 % coverage gates, Playwright
-  integration and E2E suites, release packaging.
+- Docker Compose development stack (PostgreSQL 18), Makefile, demo seed, CI with 90 % coverage
+  gates, Playwright integration and E2E suites, release packaging.
