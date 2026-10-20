@@ -45,6 +45,10 @@ updates:
       prefix: "build"
       include: scope
     labels: [dependencies, java]
+    ignore:
+      # Liferay 7.4 ships JAX-RS 2.1 (javax.ws.rs); CXF 4+ is jakarta.ws.rs only.
+      - dependency-name: "org.apache.cxf:*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: docker-compose
     directory: "/"
